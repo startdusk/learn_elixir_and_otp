@@ -18,18 +18,19 @@ defmodule Servy.Handler do
   end
 
   def route(conv) do
-    # TODO: Create a new map that also has the response body:
-    conv = %{method: "GET", path: "/wildthings", resp_body: "Bears, Lions, Tigers"}
+    # elixir每个变量都是不可变的
+    # 下面相当于 Map.put(conv, :resp_body, "xxxx")
+    # 访问map，map[:resp_body] 如果key不存在返回nil 或 map.resp_body 如果key不存在直接报错
+    %{conv | resp_body: "Bears, Lions, Tigers"}
   end
 
   def format_response(conv) do
-    # TODO: Use values in the map to create an HTTP response string
     """
     HTTP/1.1 200 OK
     Content-Type: text/html
-    Content-Length: 20
+    Content-Length: #{String.length(conv.resp_body)}
 
-    Bears, Lions,Tigers
+    #{conv.resp_body}
     """
   end
 end
