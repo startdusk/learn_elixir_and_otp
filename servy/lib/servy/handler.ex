@@ -3,9 +3,14 @@ defmodule Servy.Handler do
     # 函数式编程 管道
     request
     |> parse
+    |> rewrite_path
     |> log
     |> route
     |> format_response
+  end
+
+  def rewrite_path(conv) do
+    %{conv|path:"/wildthings"}
   end
 
   # 打印, 这样可以写成一行
