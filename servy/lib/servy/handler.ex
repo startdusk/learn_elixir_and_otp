@@ -60,6 +60,47 @@ defmodule Servy.Handler do
     %{conv | status: 200, resp_body: "Bear #{id}"}
   end
 
+  def route(%{method: "GET", path: "/about"} = conv) do
+    Path.expand("../../pages", __DIR__)
+    |> Path.join("about.html")
+    |> File.read()
+    |> handle_file(conv)
+  end
+
+  def handle_file({:ok, content}, conv) do
+    %{conv | status: 200, resp_body: content}
+  end
+
+  def handle_file({:error, :enoent}, conv) do
+    %{conv | status: 404, resp_body: "File not found"}
+  end
+
+  def handle_file({:error, reason}, conv) do
+    %{conv | status: 500, resp_body: "File error: #{reason}"}
+  end
+
+  # 等价于上面
+  # def route(%{method: "GET", path: "/about"} = conv) do
+  #   # pages_path = Path.expand("../../pages", __DIR__)
+  #   # file = Path.join(pages_path, "about.html")
+  #   # 相当于下面
+  #   file =
+  #     Path.expand("../../pages", __DIR__)
+  #     |> Path.join("about.html")
+
+  #   # case匹配和顺序相关, reason相当于匹配所有错误
+  #   case File.read(file) do
+  #     {:ok, content} ->
+  #       %{conv | status: 200, resp_body: content}
+
+  #     {:error, :enoent} ->
+  #       %{conv | status: 404, resp_body: "File not found"}
+
+  #     {:error, reason} ->
+  #       %{conv | status: 500, resp_body: "File error: #{reason}"}
+  #   end
+  # end
+
   # elixir 从上往下执行, 这个函数会被匹配到, 表示某个路径找不到
   def route(%{path: path} = conv) do
     %{conv | status: 404, resp_body: "No #{path} here!"}
@@ -134,6 +175,17 @@ IO.puts(response)
 
 request = """
 GET /bears/1 HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+"""
+
+response = Servy.Handler.handle(request)
+
+IO.puts(response)
+
+request = """
+GET /about HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
