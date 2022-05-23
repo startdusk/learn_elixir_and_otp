@@ -6,6 +6,10 @@ defmodule Servy.Handler do
   # 定义常量
   @pages_path Path.expand("../../pages", __DIR__)
 
+  # 导入外部模块, only表示只导入特定的函数,变量等, 1表示该函数的参数数量为1个
+  import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1]
+  import Servy.Parser, only: [parse: 1]
+
   @doc """
   Transforms the request into a response.
   """
@@ -18,36 +22,6 @@ defmodule Servy.Handler do
     |> route
     |> track
     |> format_response
-  end
-
-  @doc """
-  Logs 404 requests
-  """
-  def track(%{status: 404, path: path} = conv) do
-    IO.puts("Warning: #{path} is on the loose!")
-    conv
-  end
-
-  # 必须定义可以匹配全部的函数
-  def track(conv), do: conv
-
-  def rewrite_path(%{path: "/wildlife"} = conv) do
-    %{conv | path: "/wildthings"}
-  end
-
-  def rewrite_path(conv), do: conv
-
-  # 打印, 这样可以写成一行
-  def log(conv), do: IO.inspect(conv)
-
-  def parse(request) do
-    [method, path, _] =
-      request
-      |> String.split("\n")
-      |> List.first()
-      |> String.split(" ")
-
-    %{method: method, path: path, resp_body: "", status: nil}
   end
 
   # def route(conv) do
