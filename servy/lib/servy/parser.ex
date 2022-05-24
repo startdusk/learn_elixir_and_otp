@@ -1,4 +1,7 @@
 defmodule Servy.Parser do
+  # 定义别名, 由于别名是Conv, 所以可以这么写
+  alias Servy.Conv
+
   def parse(request) do
     [method, path, _] =
       request
@@ -6,6 +9,6 @@ defmodule Servy.Parser do
       |> List.first()
       |> String.split(" ")
 
-    %{method: method, path: path, resp_body: "", status: nil}
+    %Conv{method: method, path: path}
   end
 end
