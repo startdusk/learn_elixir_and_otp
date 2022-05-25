@@ -40,8 +40,13 @@ defmodule Servy.Handler do
     %{conv | status: 200, resp_body: "Bears, Lions, Tigers"}
   end
 
+  # name=Baloo&type=Brown
   def route(%Conv{method: "GET", path: "/bears"} = conv) do
-    %{conv | status: 200, resp_body: "Teddy, Smoky, Paddington"}
+    %{
+      conv
+      | status: 200,
+        resp_body: "Created a #{conv.params["type"]} bear named #{conv.params["name"]}"
+    }
   end
 
   # 匹配 /bears/{id}
@@ -111,6 +116,7 @@ GET /wildlife HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
+
 """
 
 response = Servy.Handler.handle(request)
@@ -122,6 +128,7 @@ GET /wildthings HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
+
 """
 
 response = Servy.Handler.handle(request)
@@ -133,6 +140,10 @@ GET /bears HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 21
+
+name=Baloo&type=Brown
 """
 
 response = Servy.Handler.handle(request)
@@ -144,6 +155,7 @@ GET /bigfoot HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
+
 """
 
 response = Servy.Handler.handle(request)
@@ -155,6 +167,7 @@ GET /bears/1 HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
+
 """
 
 response = Servy.Handler.handle(request)
@@ -166,6 +179,7 @@ GET /about HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
+
 """
 
 response = Servy.Handler.handle(request)
