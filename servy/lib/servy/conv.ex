@@ -1,6 +1,6 @@
 defmodule Servy.Conv do
   # 定义一个结构体，它是一个特殊的map，不能通过key访问如：map[:key]，只能通过属性访问
-  defstruct method: "", path: "", params: %{}, resp_body: "", status: nil
+  defstruct method: "", path: "", params: %{}, headers: %{}, resp_body: "", status: nil
 
   def full_status(conv) do
     "#{conv.status} #{status_reason(conv.status)}"
