@@ -4,6 +4,7 @@ defmodule Servy.Handler do
   """
 
   alias Servy.Conv
+  alias Servy.BearController
 
   # 定义常量
   @pages_path Path.expand("../../pages", __DIR__)
@@ -40,18 +41,19 @@ defmodule Servy.Handler do
     %{conv | status: 200, resp_body: "Bears, Lions, Tigers"}
   end
 
-  # name=Baloo&type=Brown
   def route(%Conv{method: "GET", path: "/bears"} = conv) do
-    %{
-      conv
-      | status: 200,
-        resp_body: "Created a #{conv.params["type"]} bear named #{conv.params["name"]}"
-    }
+    BearController.index(conv)
+  end
+
+  # name=Baloo&type=Brown
+  def route(%Conv{method: "POST", path: "/bears"} = conv) do
+    BearController.create(conv, conv.params)
   end
 
   # 匹配 /bears/{id}
   def route(%Conv{method: "GET", path: "/bears/" <> id} = conv) do
-    %{conv | status: 200, resp_body: "Bear #{id}"}
+    params = Map.put(conv.params, "id", id)
+    BearController.show(conv, params)
   end
 
   def route(%Conv{method: "GET", path: "/about"} = conv) do
@@ -137,6 +139,18 @@ IO.puts(response)
 
 request = """
 GET /bears HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+response = Servy.Handler.handle(request)
+
+IO.puts(response)
+
+request = """
+POST /bears HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
